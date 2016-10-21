@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">NetNews</string>
+
+    <string-array name="tab_title">
+        <item>新闻</item>
+        <item>视频</item>
+        <item>话题</item>
+        <item>阅读</item>
+        <item>我 </item>
+    </string-array>
+
+    <string-array name="news_tiltes">
+        <item>头条</item>
+        <item>娱乐</item>
+        <item>热点</item>
+        <item>体育</item>
+        <item>本地</item>
+        <item>网易号</item>
+        <item>财经</item>
+        <item>科技</item>
+        <item>汽车</item>
+    </string-array>
+</resources>
