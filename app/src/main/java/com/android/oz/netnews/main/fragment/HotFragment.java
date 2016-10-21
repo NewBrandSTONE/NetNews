@@ -40,7 +40,7 @@ import okhttp3.Response;
 /**
  * Created by jonesleborn on 16/8/14.
  */
-public class HotFragment extends Fragment {
+public class HotFragment extends Fragment implements ViewPager.OnPageChangeListener {
 
     private ListView lv_content;
 
@@ -51,15 +51,24 @@ public class HotFragment extends Fragment {
     private ViewPager vp_hot_header;
     // 保存轮播图内容的集合
     private List<AdsDetil> mAdsDetil;
+
     private HotImageAdapter mHotImageAdapter;
     // 轮播图的标题
     private TextView tv_title;
     // 轮播图上的点
     private LinearLayout ll_dots;
 
+    // 轮播图上的图片
+    private ArrayList<View> imageVies;
+    // 轮播图上的脚表点
+    private ArrayList<ImageView> imageDots;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        // TODO: 16/10/21 让轮播图滚动起来
+
         View view = inflater.inflate(R.layout.fragment_hot, container, false);
         lv_content = (ListView) view.findViewById(R.id.lv_content);
 
@@ -67,6 +76,10 @@ public class HotFragment extends Fragment {
         View head = inflater.inflate(R.layout.include_hot_header, null);
 
         vp_hot_header = (ViewPager) head.findViewById(R.id.vp_hot_header);
+
+        // 增加VP滑动监听
+        vp_hot_header.addOnPageChangeListener(this);
+
         tv_title = (TextView) head.findViewById(R.id.tv_title);
         // 轮播图的指示点
         ll_dots = (LinearLayout) head.findViewById(R.id.ll_dots);
@@ -84,6 +97,52 @@ public class HotFragment extends Fragment {
 
 
     private InnerHandler handler;
+
+    /**
+     * 设置角标点的样式
+     *
+     * @param index 当前轮播图的角标
+     */
+    public void setDot(int index) {
+        for (int i = 0; i < mAdsDetil.size(); i++) {
+            ImageView dot = imageDots.get(i);
+            if (i == index) {
+                dot.setImageResource(R.drawable.white_dot);
+            } else {
+                dot.setImageResource(R.drawable.gray_dot);
+            }
+        }
+    }
+
+    /**
+     * 设置不同图片的标题
+     *
+     * @param index 当前轮播图的脚标
+     */
+    public void setTitle(int index) {
+        AdsDetil adsDetil = mAdsDetil.get(index);
+        if (adsDetil != null) {
+            tv_title.setText(adsDetil.getTitle());
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        // 滑动到某一页面的百分比
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        position = position % mAdsDetil.size();
+        // 滑动到某一页面
+        setDot(position);
+        setTitle(position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        // 滑动状态的监听
+    }
 
 
     /**
@@ -136,23 +195,35 @@ public class HotFragment extends Fragment {
     public void initBanner() {
 
         if (mAdsDetil != null && mAdsDetil.size() > 0) {
-            ArrayList<View> mHotImageVies = new ArrayList<>();
+            imageVies = new ArrayList<>();
+
+            imageDots = new ArrayList<>();
+
             for (int i = 0; i < mAdsDetil.size(); i++) {
                 // 生成一个ImageView
                 View view = View.inflate(getActivity(), R.layout.item_hot_image, null);
-                mHotImageVies.add(view);
+                imageVies.add(view);
 
                 ImageView dot = new ImageView(getActivity());
-                dot.setImageResource(R.drawable.white_dot);
-                ll_dots.addView(dot);
+                dot.setImageResource(R.drawable.gray_dot);
+                // 设置添加的样式
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                p.setMargins(10, 0, 0, 0);
+                ll_dots.addView(dot, p);
+                // 将角标添加到集合中
+                imageDots.add(dot);
             }
-            mHotImageAdapter = new HotImageAdapter(mAdsDetil, mHotImageVies);
+            mHotImageAdapter = new HotImageAdapter(mAdsDetil, imageVies);
             // 设置Adapter
             vp_hot_header.setAdapter(mHotImageAdapter);
 
             // 设置轮播图的标题
             AdsDetil adsDetil = mAdsDetil.get(0);
             tv_title.setText(adsDetil.getTitle());
+
+            // 一开始角标就在第一个
+            setDot(0);
         }
     }
 

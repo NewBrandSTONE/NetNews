@@ -29,7 +29,7 @@ public class HotImageAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return mDetils.size();
+        return Integer.MAX_VALUE;
     }
 
     //
@@ -41,6 +41,9 @@ public class HotImageAdapter extends PagerAdapter {
     // 显示某个VIew会调用的方法
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+
+        position = position % mDetils.size();
+
         // 拿到某个ImageView
         View view = imagesView.get(position);
         ImageView imageView = (ImageView) view.findViewById(R.id.iv_img);

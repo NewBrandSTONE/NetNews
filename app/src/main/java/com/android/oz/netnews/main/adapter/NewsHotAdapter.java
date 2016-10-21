@@ -33,7 +33,6 @@ public class NewsHotAdapter extends BaseAdapter {
         // ImageLoader显示图片的配置
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-
                 .cacheInMemory(true)
                 // 图片为空的时候，显示的图片
                 .showImageForEmptyUri(R.drawable.ic_main_menu_gold)
@@ -108,4 +107,6 @@ public class NewsHotAdapter extends BaseAdapter {
         TextView special_topic;
         TextView numbers;
     }
+
+
 }
