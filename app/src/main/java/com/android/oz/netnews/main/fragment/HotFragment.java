@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -40,13 +41,16 @@ import okhttp3.Response;
 /**
  * Created by jonesleborn on 16/8/14.
  */
-public class HotFragment extends Fragment implements ViewPager.OnPageChangeListener {
+public class HotFragment extends Fragment implements ViewPager.OnPageChangeListener, AbsListView.OnScrollListener {
 
     private ListView lv_content;
 
     private NewsHotAdapter mAdatper;
 
+    // 初始化操作
     private final static int INIT = 1;
+    // 代表加载更多的更新操作
+    private final static int UPDATE = 2;
 
     private ViewPager vp_hot_header;
     // 保存轮播图内容的集合
@@ -63,11 +67,35 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     // 轮播图上的脚表点
     private ArrayList<ImageView> imageDots;
 
+    // 判断是否滑动到最底部
+    private boolean isToEnd = false;
+
+    // 当前页数
+    int index = 0;
+
+    private boolean isGettingHttp = false;
+
+    /**
+     * 获取当前页面的url
+     *
+     * @return
+     */
+    public String getUrl() {
+        int start, end;
+        if (index == 0) {
+            start = 0;
+            end = 20;
+        } else {
+            start = (index) * 20 + 1;
+            end = (index + 1) * 20;
+        }
+        return FileConstant.getHotUrl(start, end);
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        // TODO: 16/10/21 让轮播图滚动起来
 
         View view = inflater.inflate(R.layout.fragment_hot, container, false);
         lv_content = (ListView) view.findViewById(R.id.lv_content);
@@ -79,6 +107,7 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
         // 增加VP滑动监听
         vp_hot_header.addOnPageChangeListener(this);
+
 
         tv_title = (TextView) head.findViewById(R.id.tv_title);
         // 轮播图的指示点
@@ -92,6 +121,11 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
         // 初始化Handler
         handler = new InnerHandler(this);
+
+        // 增加滚动的监听
+        lv_content.setOnScrollListener(this);
+
+
         return view;
     }
 
@@ -144,6 +178,25 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         // 滑动状态的监听
     }
 
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        // ListView停止滑动
+        if (scrollState == SCROLL_STATE_IDLE && isToEnd) {
+            // 加载下一页
+            getData2(false);
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        int lastPosition = view.getLastVisiblePosition();
+        if (lastPosition == totalItemCount - 1) {
+            isToEnd = true;
+        } else {
+            isToEnd = false;
+        }
+    }
+
 
     /**
      * 1. 将Handler类变成了静态的内部类
@@ -187,7 +240,17 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                     // 显示轮播图的数据
                     hotFragment.initBanner();
                     break;
+                case UPDATE:
+                    List<HotNewDetil> newDetils = (List<HotNewDetil>) msg.obj;
+                    hotFragment.addDate(newDetils);
+                    break;
             }
+        }
+    }
+
+    public void addDate(List<HotNewDetil> newDetails) {
+        if (mAdatper != null) {
+            mAdatper.addNewData(newDetails);
         }
     }
 
@@ -224,6 +287,11 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
             // 一开始角标就在第一个
             setDot(0);
+
+            // 将开始的位置设置成中间
+            int offSize = ((Integer.MAX_VALUE / 2) % (imageVies.size()));
+
+            vp_hot_header.setCurrentItem((Integer.MAX_VALUE / 2) - offSize);
         }
     }
 
@@ -237,30 +305,56 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // getHot();
-        getData2();
+        getData2(true);
     }
 
-    public void getData2() {
+    public void getData2(final boolean isFirst) {
+
+        if (isGettingHttp) {
+            return;
+        }
+
+        // 正在获取http请求
+        isGettingHttp = true;
+
+        String url = getUrl();
+
         HttpUtil util = HttpUtil.getInstace();
 
-        util.doGet(FileConstant.news_hot_url, new HttpResponse<Hot>(Hot.class) {
+        util.doGet(url, new HttpResponse<Hot>(Hot.class) {
             @Override
             public void onSuccess(Hot hot) {
+
+                isGettingHttp = false;
+
                 if (hot != null) {
                     // 热门页面数据请求成功
                     List<HotNewDetil> detils = hot.getT1348647909107();
 
-                    // 使用Handler更新UI
-                    Message msg = Message.obtain();
-                    msg.what = INIT;
-                    msg.obj = detils;
-                    handler.sendMessage(msg);
+                    if (isFirst) {
+                        // 使用Handler更新UI
+                        Message msg = Message.obtain();
+                        msg.what = INIT;
+                        msg.obj = detils;
+                        handler.sendMessage(msg);
+                    } else {
+                        // 使用Handler更新UI
+                        Message msg = Message.obtain();
+                        msg.what = UPDATE;
+                        msg.obj = detils;
+                        handler.sendMessage(msg);
+                    }
+
+
+                    // 为了获取下一页的数据
+                    index++;
                 }
             }
 
             @Override
             public void onFail(String msg) {
                 Log.v("Oz", msg);
+                isGettingHttp = false;
             }
         });
     }

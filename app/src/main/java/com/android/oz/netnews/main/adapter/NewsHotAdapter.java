@@ -108,5 +108,12 @@ public class NewsHotAdapter extends BaseAdapter {
         TextView numbers;
     }
 
+    /**
+     * 当有新的数据增加新来的时候调用这个方法
+     */
+    public void addNewData(List<HotNewDetil> next) {
+        mData.addAll(next);
+        notifyDataSetChanged();
+    }
 
 }
