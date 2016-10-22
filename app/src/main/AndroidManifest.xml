@@ -17,6 +17,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".main.activity.NewDetailActivity" />
+
+        <activity android:name=".main.activity.PhotoDetailActivity" />
+
         <service android:name=".service.AdsIntentService" />
 
         <activity android:name=".splash.WebViewActivity" />

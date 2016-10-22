@@ -1,16 +1,19 @@
 package com.android.oz.netnews.main.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -21,6 +24,8 @@ import com.android.oz.netnews.bean.AdsDetil;
 import com.android.oz.netnews.bean.Hot;
 import com.android.oz.netnews.bean.HotNewDetil;
 import com.android.oz.netnews.constant.FileConstant;
+import com.android.oz.netnews.constant.MyConstance;
+import com.android.oz.netnews.main.activity.NewDetailActivity;
 import com.android.oz.netnews.main.adapter.HotImageAdapter;
 import com.android.oz.netnews.main.adapter.NewsHotAdapter;
 import com.android.oz.netnews.utils.HttpResponse;
@@ -69,6 +74,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
 
     // 判断是否滑动到最底部
     private boolean isToEnd = false;
+    // 保存热门新闻
+    private ArrayList<HotNewDetil> allDetails = new ArrayList<>();
 
     // 当前页数
     int index = 0;
@@ -125,6 +132,26 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
         // 增加滚动的监听
         lv_content.setOnScrollListener(this);
 
+        lv_content.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HotNewDetil hotNewDetil = allDetails.get(position);
+                String specialId = hotNewDetil.getSpecialID();
+
+                if (!TextUtils.isEmpty(specialId)) {
+                    // 跳转到专题页面
+                    Log.v("Oz", "specialId-->" + specialId);
+
+                } else {
+                    // 跳转到详细页面
+                    String docId = hotNewDetil.getDocid();
+                    Log.v("Oz", "docId-->" + docId);
+                    Intent newIntent = MyConstance.getNewIntent(getActivity().getApplicationContext(), NewDetailActivity.class);
+                    newIntent.putExtra(NewDetailActivity.DOC_ID, docId);
+                    startActivity(newIntent);
+                }
+            }
+        });
 
         return view;
     }
@@ -224,6 +251,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
             switch (msg.what) {
                 case INIT:
                     List<HotNewDetil> detils = (List<HotNewDetil>) msg.obj;
+                    // 将请求到的数据添加到集合中
+                    hotFragment.allDetails.addAll(detils);
 
                     // 取出轮播图中的数据
                     HotNewDetil hotNewDetil = detils.get(0);
@@ -243,6 +272,8 @@ public class HotFragment extends Fragment implements ViewPager.OnPageChangeListe
                 case UPDATE:
                     List<HotNewDetil> newDetils = (List<HotNewDetil>) msg.obj;
                     hotFragment.addDate(newDetils);
+                    // 这里也要添加
+                    hotFragment.allDetails.addAll(newDetils);
                     break;
             }
         }

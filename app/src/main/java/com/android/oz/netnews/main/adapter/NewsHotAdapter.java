@@ -2,6 +2,7 @@ package com.android.oz.netnews.main.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -96,6 +97,14 @@ public class NewsHotAdapter extends BaseAdapter {
         holder.news_title.setText(detil.getTitle());
         holder.news_from.setText(detil.getSource());
         holder.numbers.setText(detil.getReplyCount() + "");
+        if (!TextUtils.isEmpty(detil.getSpecialID())) {
+            holder.special_topic.setVisibility(View.VISIBLE);
+            holder.numbers.setVisibility(View.GONE);
+        } else {
+            holder.numbers.setVisibility(View.VISIBLE);
+            holder.numbers.setText(detil.getReplyCount() + "回帖");
+            holder.special_topic.setVisibility(View.GONE);
+        }
         // 在这里别忘记传递ImagLoader的options参数
         ImageLoader.getInstance().displayImage(detil.getImg(), holder.img, options);
     }
