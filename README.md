@@ -27,6 +27,8 @@ IDE：Android Studio 2.2.0
 - [x] Fragment+tabhost构建分类标签
 - [x] 首页Handler的优化（使用弱引用）
 - [x] 滑动到底部请求更多新闻数据
+- [x] 轮播图、轮播图的左右滚动
+- [ ] 轮播图的自动滚动 
 
 ###新闻详情页
 - [x] js代码调用java代码显示图片
