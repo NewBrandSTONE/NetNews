@@ -14,9 +14,6 @@ IDE：Android Studio 2.2.0
 * [photoview](https://github.com/chrisbanes/PhotoView)
 
 ##效果预览
-
-[效果预览](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
-
 ![效果.gif](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
 
 ##功能列表
@@ -39,3 +36,5 @@ IDE：Android Studio 2.2.0
 - [x] js代码调用java代码显示图片
 - [x] 使用photoview展示新闻详情页中的图片内容
 - [ ] 侧滑返回(侧滑关闭activity)
+- [ ] 分享
+- [ ] 查看评论 
