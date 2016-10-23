@@ -15,7 +15,7 @@ IDE：Android Studio 2.2.0
 
 ##效果预览
 
-(效果预览)[http://ofiamtjor.bkt.clouddn.com/Untitled.gif]
+[效果预览](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
 
 ![效果.gif](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
 
