@@ -14,9 +14,9 @@ IDE：Android Studio 2.2.0
 * [photoview](https://github.com/chrisbanes/PhotoView)
 
 ##效果预览
-[效果](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
+[效果](http://ofiamtjor.bkt.clouddn.com/Untitled2.gif)
 
-![效果.gif](http://ofiamtjor.bkt.clouddn.com/Untitled.gif)
+![效果.gif](http://ofiamtjor.bkt.clouddn.com/Untitled2.gif)
 
 ##功能列表
 
